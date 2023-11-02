@@ -91,18 +91,16 @@ function getStream (type) {
   var constraints = {};
   constraints[type] = true;
   
-  getUserMedia(constraints)
-    .then(function (stream) {
-      var mediaControl = document.querySelector(type);
-      
-      if ('srcObject' in mediaControl) {
-        mediaControl.srcObject = stream;
-      } else if (navigator.mozGetUserMedia) {
-        mediaControl.mozSrcObject = stream;
-      } else {
-        mediaControl.src = (window.URL || window.webkitURL).createObjectURL(stream);
-      }
-      
+  getUserMedia(constraints, function (stream) {
+    var mediaControl = document.querySelector('video');
+    
+    if ('srcObject' in mediaControl) {
+      mediaControl.srcObject = stream;
+    } else if (navigator.mozGetUserMedia) {
+      mediaControl.mozSrcObject = stream;
+    } else {
+      mediaControl.src = (window.URL || window.webkitURL).createObjectURL(stream);
+    } 
       mediaControl.play();
     })
     .catch(function (err) {
