@@ -1,111 +1,11 @@
-const container = document.querySelector(".container");
-const coffees = [
-  {
-    name: "Perspiciatis",
-    image: "images/coffee1.jpg"
-  },
-  {
-    name: "Voluptatem",
-    image: "images/coffee2.jpg"
-  },
-  {
-    name: "Explicabo",
-    image: "images/coffee3.jpg"
-  },
-  {
-    name: "Rchitecto",
-    image: "images/coffee4.jpg"
-  },
-  {
-    name: " Beatae",
-    image: "images/coffee5.jpg"
-  },
-  {
-    name: " Vitae",
-    image: "images/coffee6.jpg"
-  },
-  {
-    name: "Inventore",
-    image: "images/coffee7.jpg"
-  },
-  {
-    name: "Veritatis",
-    image: "images/coffee8.jpg"
-  },
-  {
-    name: "Accusantium",
-    image: "images/coffee9.jpg"
-  }
-];
-const showCoffees = () => {
-  let output = "";
-  coffees.forEach(
-    ({ name, image }) =>
-      (output += `
-              <div class="card">
-                <img class="card--avatar" src=${image} />
-                <h1 class="card--title">${name}</h1>
-                <a class="card--link" href="#">Taste</a>
-              </div>
-              `)
-  );
-  container.innerHTML = output;
-};
 
-document.addEventListener("DOMContentLoaded", showCoffees);
-
-if ("serviceWorker" in navigator) {
-  window.addEventListener("load", function() {
+if (navigator.serviceWorker) {
+  window.addEventListener("load", () => {
     navigator.serviceWorker
-      .register("./serviceWorker.js", {scope:"./"})
-      .then(res => console.log("service worker registered"))
-      .catch(err => console.log("service worker not registered", err));
+      .register("/sw.js")
+      .then(regEvent => console.log("Service worker registered!"))
+      .catch(err => console.log("Service worker not registered"));
   });
-}
-
-function getUserMedia(constraints) {
-  // if Promise-based API is available, use it
-  if (navigator.mediaDevices) {
-    return navigator.mediaDevices.getUserMedia(constraints);
-  }
-    
-  // otherwise try falling back to old, possibly prefixed API...
-  var legacyApi = navigator.getUserMedia || navigator.webkitGetUserMedia ||
-    navigator.mozGetUserMedia || navigator.msGetUserMedia;
-    
-  if (legacyApi) {
-    // ...and promisify it
-    return new Promise(function (resolve, reject) {
-      legacyApi.bind(navigator)(constraints, resolve, reject);
-    });
-  }
-}
-
-function getStream (type) {
-  if (!navigator.mediaDevices && !navigator.getUserMedia && !navigator.webkitGetUserMedia &&
-    !navigator.mozGetUserMedia && !navigator.msGetUserMedia) {
-    alert('User Media API not supported.');
-    return;
-  }
-
-  var constraints = {};
-  constraints[type] = true;
-  
-  getUserMedia(constraints, function (stream) {
-    var mediaControl = document.querySelector('video');
-    
-    if ('srcObject' in mediaControl) {
-      mediaControl.srcObject = stream;
-    } else if (navigator.mozGetUserMedia) {
-      mediaControl.mozSrcObject = stream;
-    } else {
-      mediaControl.src = (window.URL || window.webkitURL).createObjectURL(stream);
-    } 
-      mediaControl.play();
-    })
-    .catch(function (err) {
-      alert('Error: ' + err);
-    });
 }
 function getUserMedia(options, successCallback, failureCallback) {
   var api = navigator.getUserMedia || navigator.webkitGetUserMedia ||
@@ -119,62 +19,167 @@ var theStream;
 var theRecorder;
 var recordedChunks = [];
 
+// This function initializes user media
+function getUserMedia(options, successCallback, failureCallback) {
+  if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+    return navigator.mediaDevices.getUserMedia(options)
+      .then(successCallback)
+      .catch(failureCallback);
+  }
+  throw new Error('User Media API not supported.');
+}
+
+
+// This function is called to start the media stream and recording
 function getStream() {
-  if (!navigator.getUserMedia && !navigator.webkitGetUserMedia &&
-    !navigator.mozGetUserMedia && !navigator.msGetUserMedia) {
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
     alert('User Media API not supported.');
     return;
   }
-  
-  var constraints = {video: true, audio: true};
+
+  var constraints = { video: true, audio: true };
   getUserMedia(constraints, function (stream) {
     var mediaControl = document.querySelector('video');
     
-    if ('srcObject' in mediaControl) {
+    // Older browsers may not have srcObject
+    if ("srcObject" in mediaControl) {
       mediaControl.srcObject = stream;
-    } else if (navigator.mozGetUserMedia) {
-      mediaControl.mozSrcObject = stream;
     } else {
-      mediaControl.src = (window.URL || window.webkitURL).createObjectURL(stream);
+      // Avoid using this in new browsers, as it is going away.
+      mediaControl.src = window.URL.createObjectURL(stream);
     }
     
     theStream = stream;
-    try {
-      recorder = new MediaRecorder(stream, {mimeType : "video/webm"});
-    } catch (e) {
-      console.error('Exception while creating MediaRecorder: ' + e);
-      return;
-    }
-    theRecorder = recorder;
-    console.log('MediaRecorder created');
-    recorder.ondataavailable = recorderOnDataAvailable;
-    recorder.start(100);
+    setupRecorder(stream); // This is a new function to encapsulate the recorder setup
   }, function (err) {
     alert('Error: ' + err);
   });
 }
-
-function recorderOnDataAvailable(event) {
-  if (event.data.size == 0) return;
-  recordedChunks.push(event.data);
+function setupRecorder(stream) {
+  try {
+    theRecorder = new MediaRecorder(stream, { mimeType: 'video/webm' });
+    theRecorder.ondataavailable = function(event) {
+      if (event.data.size > 0) {
+        recordedChunks.push(event.data);
+      }
+    };
+    theRecorder.start(100); // Collect 100ms of data chunks
+  } catch (e) {
+    console.error('Exception while creating MediaRecorder:', e);
+    return;
+  }
+  console.log('MediaRecorder created');
 }
 
-function download() {
-  console.log('Saving data');
-  theRecorder.stop();
-  theStream.getTracks()[0].stop();
+// This new function retrieves the video from the cache and downloads it.
+async function downloadFromCache() {
+  const videoKey = 'my_recorded_video.webm';  // This should match the key used when saving the video.
 
-  var blob = new Blob(recordedChunks, {type: "video/webm"});
-  var url = (window.URL || window.webkitURL).createObjectURL(blob);
-  var a = document.createElement("a");
-  document.body.appendChild(a);
-  a.style = "display: none";
-  a.href = url;
-  a.download = 'test.webm';
-  a.click();
-  
-  // setTimeout() here is needed for Firefox.
-  setTimeout(function () {
-      (window.URL || window.webkitURL).revokeObjectURL(url);
-  }, 100); 
+  if (!('caches' in window)) {
+    alert('Cache API not supported!');
+    return;
+  }
+
+  try {
+    const cache = await caches.open('video-cache');
+    const cachedResponse = await cache.match(videoKey);
+    
+    if (!cachedResponse || !cachedResponse.ok) {
+      throw new Error('No cached video found!');
+    }
+
+    const blob = await cachedResponse.blob();
+    const url = window.URL.createObjectURL(blob);
+    
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'downloaded_video.webm';
+    document.body.appendChild(a);
+    a.click();
+    
+    // Cleanup
+    window.URL.revokeObjectURL(url);
+    document.body.removeChild(a);
+  } catch (err) {
+    console.error('Failed to download video from cache:', err);
+    alert(`Error: ${err.message}`);
+  }
+}
+
+
+
+// Stops the recording and saves the video to cache
+function stopRecordingAndSaveToCache() {
+  console.log('Stopping recording and saving data');
+  theRecorder.stop();
+  theStream.getTracks().forEach(track => track.stop());
+
+  theRecorder.onstop = function() {
+    // Create a Blob from the recorded chunks
+    var blob = new Blob(recordedChunks, { type: 'video/webm' });
+    saveToCache(blob);
+  };
+}
+
+// Saves the recording Blob to the cache
+function saveToCache(blob) {
+  if ('caches' in window) {
+    const videoKey = 'my_recorded_video.webm';
+    const request = new Request(videoKey, { mode: 'no-cors' });
+    const response = new Response(blob);
+
+    caches.open('video-cache').then(cache => {
+      cache.put(request, response).then(() => {
+        console.log('Saved video to cache.');
+      }).catch(error => {
+        console.error('Failed to save video to cache:', error);
+      });
+    });
+  } else {
+    console.error('Cache API not supported');
+  }
+}
+
+//playback the video from the cache
+async function playbackFromCache() {
+  const videoKey = 'my_recorded_video.webm';
+
+  if (!('caches' in window)) {
+    alert('Cache-API wird nicht unterstützt!');
+    return;
+  }
+
+  try {
+    const cache = await caches.open('video-cache');
+    const cachedResponse = await cache.match(videoKey);
+
+    if (!cachedResponse || !cachedResponse.ok) {
+      throw new Error('Kein zwischengespeichertes Video gefunden!');
+    }
+
+    const blob = await cachedResponse.blob();
+    const url = window.URL.createObjectURL(blob);
+
+    const video = document.getElementById('playbackVideo'); // Änderung: Verwenden Sie das playbackVideo-Element
+    video.src = url;
+    video.play();
+  } catch (err) {
+    console.error('Fehler beim Abspielen des Videos aus dem Cache:', err);
+    alert(`Fehler: ${err.message}`);
+  }
+}
+
+document.getElementById('playButton').addEventListener('click', playbackFromCache);
+
+// Funktion, um den Cache zu leeren
+function clearCache() {
+  if ('caches' in window) {
+    caches.delete('video-cache').then(() => {
+      console.log('Cache geleert!');
+    }).catch(error => {
+      console.error('Fehler beim Leeren des Caches:', error);
+    });
+  } else {
+    console.error('Cache-API wird nicht unterstützt');
+  }
 }
