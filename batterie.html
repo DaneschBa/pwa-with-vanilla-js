@@ -39,7 +39,7 @@
     <script>
         if ('getBattery' in navigator || ('battery' in navigator && 'Promise' in window)) {
             var target = document.getElementById('battery-bar');
-            var batteryLevel = document.getElementById('battery-level');
+            var batteryLevel = document.getElementById('level');
 
             function updateBatteryLevel(level) {
                 batteryLevel.style.width = (level * 100) + '%';
