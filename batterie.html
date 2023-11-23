@@ -11,13 +11,13 @@
             height: 20px;
             background-color: #ddd;
             position: relative;
-            overflow: hidden; /* Verhindert, dass der Inhalt über den Rahmen hinausgeht */
+            overflow: hidden;
         }
 
         #battery-level {
             height: 100%;
             background-color: green;
-            transition: width 0.5s; /* Fügt eine sanfte Übergangseffekt hinzu */
+            transition: width 0.5s;
         }
     </style>
 </head>
@@ -41,8 +41,8 @@
             var target = document.getElementById('battery-bar');
             var batteryLevel = document.getElementById('battery-level');
 
-            function updateBatteryLevel() {
-                batteryLevel.style.width = (battery.level * 100) + '%';
+            function updateBatteryLevel(level) {
+                batteryLevel.style.width = (level * 100) + '%';
             }
 
             function handleChange(change) {
@@ -50,7 +50,7 @@
                 var newState = document.createElement('p');
                 newState.innerHTML = '' + timeBadge + ' ' + change + '.';
                 target.appendChild(newState);
-                updateBatteryLevel(); // Aktualisiere den Batteriestatus beim Ändern
+                updateBatteryLevel(level); // Aktualisiere den Batteriestatus beim Ändern
             }
 
             function onChargingChange() {
@@ -83,12 +83,14 @@
                 document.getElementById('dischargingTime').innerHTML = battery.dischargingTime + ' s';
                 document.getElementById('level').innerHTML = (battery.level * 100) + '%';
 
-                updateBatteryLevel(); // Aktualisiere den Batteriestatus beim Laden der Seite
+                updateBatteryLevel(battery.level); // Aktualisiere den Batteriestatus beim Laden der Seite
 
                 battery.addEventListener('chargingchange', onChargingChange);
                 battery.addEventListener('chargingtimechange', onChargingTimeChange);
                 battery.addEventListener('dischargingtimechange', onDischargingTimeChange);
-                battery.addEventListener('levelchange', onLevelChange);
+                battery.addEventListener('levelchange', function() {
+                    onLevelChange.call(battery); // Rufe die Funktion mit "this" als "battery" auf
+                });
             });
         }
     </script>
