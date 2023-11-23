@@ -39,7 +39,7 @@
     <script>
         if ('getBattery' in navigator || ('battery' in navigator && 'Promise' in window)) {
             var target = document.getElementById('battery-bar');
-            var batteryLevel = document.getElementById('level');
+            var batteryLevel = document.getElementById('battery-level');
 
             function updateBatteryLevel(level) {
                 batteryLevel.style.width = (level * 100) + '%';
@@ -50,7 +50,7 @@
                 var newState = document.createElement('p');
                 newState.innerHTML = '' + timeBadge + ' ' + change + '.';
                 target.appendChild(newState);
-                updateBatteryLevel(level);
+                updateBatteryLevel(level); // Aktualisiere den Batteriestatus beim Ändern
             }
 
             function onChargingChange() {
@@ -83,13 +83,13 @@
                 document.getElementById('dischargingTime').innerHTML = battery.dischargingTime + ' s';
                 document.getElementById('level').innerHTML = (battery.level * 100) + '%';
 
-                updateBatteryLevel(battery.level);
+                updateBatteryLevel(battery.level); // Aktualisiere den Batteriestatus beim Laden der Seite
 
                 battery.addEventListener('chargingchange', onChargingChange);
                 battery.addEventListener('chargingtimechange', onChargingTimeChange);
                 battery.addEventListener('dischargingtimechange', onDischargingTimeChange);
                 battery.addEventListener('levelchange', function() {
-                    onLevelChange.call(battery); 
+                    onLevelChange.call(battery); // Rufe die Funktion mit "this" als "battery" auf
                 });
             });
         }
