@@ -37,33 +37,6 @@
     <div id="target"></div>
 
     <script>
-        // Simuliere den Batteriestatus für das Beispiel
-        const batteryStatus = {
-            level: 0.75, // Beispiel: 75%
-            charging: true, // Beispiel: Lädt
-            chargingTime: 120, // Beispiel: 2 Stunden
-            dischargingTime: 240 // Beispiel: 4 Stunden
-        };
-
-        // Funktion zum Aktualisieren der Anzeige
-        function updateBatteryDisplay() {
-            const targetDiv = document.getElementById('target');
-            targetDiv.innerHTML = ''; // Leere den Inhalt
-
-            // Erstelle farbige Blöcke basierend auf dem Batteriestatus
-            const batteryLevelDiv = document.createElement('div');
-            batteryLevelDiv.className = 'battery-level';
-            batteryLevelDiv.style.backgroundColor = batteryStatus.charging ? 'green' : 'yellow';
-            batteryLevelDiv.style.width = `${batteryStatus.level * 100}%`;
-            targetDiv.appendChild(batteryLevelDiv);
-
-            // Weitere Informationen können hinzugefügt werden
-
-
-
-
-
-
             if ('getBattery' in navigator || ('battery' in navigator && 'Promise' in window)) {
   var target = document.getElementById('target');
 
@@ -105,18 +78,8 @@
     battery.addEventListener('chargingtimechange', onChargingTimeChange);
     battery.addEventListener('dischargingtimechange', onDischargingTimeChange);
     battery.addEventListener('levelchange', onLevelChange);
-  });
-}
-
-
-
-
-
-            
+  });    
         }
-
-        // Rufe die Funktion auf, um die Anzeige zu initialisieren
-        updateBatteryDisplay();
     </script>
             <script src="js/app.js"></script>
 </body>
