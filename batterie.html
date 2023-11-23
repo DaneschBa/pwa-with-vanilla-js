@@ -50,7 +50,7 @@
                 var newState = document.createElement('p');
                 newState.innerHTML = '' + timeBadge + ' ' + change + '.';
                 target.appendChild(newState);
-                updateBatteryLevel(level); // Aktualisiere den Batteriestatus beim Ändern
+                updateBatteryLevel(level);
             }
 
             function onChargingChange() {
@@ -83,13 +83,13 @@
                 document.getElementById('dischargingTime').innerHTML = battery.dischargingTime + ' s';
                 document.getElementById('level').innerHTML = (battery.level * 100) + '%';
 
-                updateBatteryLevel(battery.level); // Aktualisiere den Batteriestatus beim Laden der Seite
+                updateBatteryLevel(battery.level);
 
                 battery.addEventListener('chargingchange', onChargingChange);
                 battery.addEventListener('chargingtimechange', onChargingTimeChange);
                 battery.addEventListener('dischargingtimechange', onDischargingTimeChange);
                 battery.addEventListener('levelchange', function() {
-                    onLevelChange.call(battery); // Rufe die Funktion mit "this" als "battery" auf
+                    onLevelChange.call(battery); 
                 });
             });
         }
