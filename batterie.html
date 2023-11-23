@@ -36,6 +36,7 @@
 
     <script>
         if ('getBattery' in navigator || ('battery' in navigator && 'Promise' in window)) {
+            var target = document.getElementById('battery-bar');
             var batteryLevel = document.getElementById('battery-level');
 
             function updateBatteryLevel() {
@@ -50,7 +51,29 @@
                 updateBatteryLevel(); // Aktualisiere den Batteriestatus beim Ändern
             }
 
-            // Restlicher Code bleibt unverändert...
+            function onChargingChange() {
+                handleChange('Batterieladestatus geändert auf ' + (this.charging ? 'Lädt' : 'Entlädt') + '');
+            }
+
+            function onChargingTimeChange() {
+                handleChange('Batterieladezeit geändert auf ' + this.chargingTime + ' s');
+            }
+
+            function onDischargingTimeChange() {
+                handleChange('Batterieentladezeit geändert auf ' + this.dischargingTime + ' s');
+            }
+
+            function onLevelChange() {
+                handleChange('Batteriestatus geändert auf ' + (this.level * 100) + '%');
+            }
+
+            var batteryPromise;
+
+            if ('getBattery' in navigator) {
+                batteryPromise = navigator.getBattery();
+            } else {
+                batteryPromise = Promise.resolve(navigator.battery);
+            }
 
             batteryPromise.then(function (battery) {
                 document.getElementById('charging').innerHTML = battery.charging ? 'Lädt' : 'Entlädt';
