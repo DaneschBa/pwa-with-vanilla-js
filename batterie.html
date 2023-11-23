@@ -5,39 +5,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Batteriestatus</title>
 
-    <style>
-        #target {
-            display: flex;
-            align-items: center;
-        }
-
-        .battery-level {
-            width: 30px;
-            height: 15px;
-            border: 1px solid #000;
-            margin-right: 5px;
-        }
-    </style>
 </head>
 <body>
-
     <nav>
         <ul>
             <li><a href="homepage.html">Homepage</a></li>
             <li><a href="index.html">Main</a></li>
             <li><a href="batterie.html">Batterie Status</a></li>
-            
 
-    <script src="js/app.js"></script>
 
-    
-    
-    <p>Initialer Batteriestatus: <b id="charging">unbekannt</b>, Ladezeit: <b id="chargingTime">unbekannt</b>, Entladezeit: <b id="dischargingTime">unbekannt</b>, Level: <b id="level">unbekannt</b>.</p>
+<p>Initial battery status was <b id="charging">unknown</b>, charging time <b id="chargingTime">unknown</b>, discharging time <b id="dischargingTime">unknown</b>, level <b id="level">unknown</b>.</p>
 
-    <div id="target"></div>
-
-    <script>
-            if ('getBattery' in navigator || ('battery' in navigator && 'Promise' in window)) {
+<div id="target"></div>
+            <script>
+                if ('getBattery' in navigator || ('battery' in navigator && 'Promise' in window)) {
   var target = document.getElementById('target');
 
   function handleChange(change) {
@@ -78,8 +59,15 @@
     battery.addEventListener('chargingtimechange', onChargingTimeChange);
     battery.addEventListener('dischargingtimechange', onDischargingTimeChange);
     battery.addEventListener('levelchange', onLevelChange);
-  });    
-        }
-    </script>
+  });
+}
+</script>
+
+
+
+
+            
+
+    <script src="js/app.js"></script>
 </body>
 </html>
