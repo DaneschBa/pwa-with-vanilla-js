@@ -1,7 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Batteriestatus</title>
+
+    <style>
         #target {
             display: flex;
             align-items: center;
@@ -16,23 +20,36 @@
     </style>
 </head>
 <body>
-    <header>
-        <h1>Battery Status</h1>
-    </header>
-    
-    <nav>
-        <ul>
-            <li><a href="homepage.html">Homepage</a></li>
-            <li><a href="index.html">Main</a></li>
-            <li><a href="batteri.html">Batterie Status</a></li>
-            
-            
-  <p>Initial battery status was <b id="charging">unknown</b>, charging time <b id="chargingTime">unknown</b>, discharging time <b id="dischargingTime">unknown</b>, level <b id="level">unknown</b>.</p>
+    <p>Initialer Batteriestatus: <b id="charging">unbekannt</b>, Ladezeit: <b id="chargingTime">unbekannt</b>, Entladezeit: <b id="dischargingTime">unbekannt</b>, Level: <b id="level">unbekannt</b>.</p>
 
-<div id="target"></div>
+    <div id="target"></div>
 
+    <script>
+        // Simuliere den Batteriestatus für das Beispiel
+        const batteryStatus = {
+            level: 0.75, // Beispiel: 75%
+            charging: true, // Beispiel: Lädt
+            chargingTime: 120, // Beispiel: 2 Stunden
+            dischargingTime: 240 // Beispiel: 4 Stunden
+        };
 
-    <script src="js/app.js"></script>
+        // Funktion zum Aktualisieren der Anzeige
+        function updateBatteryDisplay() {
+            const targetDiv = document.getElementById('target');
+            targetDiv.innerHTML = ''; // Leere den Inhalt
+
+            // Erstelle farbige Blöcke basierend auf dem Batteriestatus
+            const batteryLevelDiv = document.createElement('div');
+            batteryLevelDiv.className = 'battery-level';
+            batteryLevelDiv.style.backgroundColor = batteryStatus.charging ? 'green' : 'yellow';
+            batteryLevelDiv.style.width = `${batteryStatus.level * 100}%`;
+            targetDiv.appendChild(batteryLevelDiv);
+
+            // Weitere Informationen können hinzugefügt werden
+        }
+
+        // Rufe die Funktion auf, um die Anzeige zu initialisieren
+        updateBatteryDisplay();
+    </script>
 </body>
 </html>
-
