@@ -119,29 +119,43 @@
         </table>
 
         <script>
-                let balance;
-                let expenses = [];
 
-                // Load expenses from local storage
-                if (localStorage.getItem('expenses')) {
-                    expenses = JSON.parse(localStorage.getItem('expenses'));
-                    updateTable();
-                }
+let balance = 0;
+let expenses = [];
 
-                function setInitialEntry() {
-                    const startingBalance = parseFloat(document.getElementById('balanceInput').value) || 0;
-                    balance = startingBalance;
-                    const initialEntry = {
-                        description: 'Starting Balance',
-                        date: new Date().toLocaleDateString(),
-                        category: 'Initial Entry',
-                        amount: 0,
-                        balance: startingBalance,
-                    };
-                    expenses.push(initialEntry);
-                    updateTable();
-                    updateLocalStorage();
-                }
+// Funktion, um den Balance-Wert vom lokalen Speicher abzurufen
+function loadBalanceFromLocalStorage() {
+    const savedBalance = localStorage.getItem('balance');
+    return savedBalance ? parseFloat(savedBalance) : 0;
+}
+
+// Funktion, um die Ausgaben vom lokalen Speicher abzurufen
+function loadExpensesFromLocalStorage() {
+    const savedExpenses = localStorage.getItem('expenses');
+    return savedExpenses ? JSON.parse(savedExpenses) : [];
+}
+
+// Load balance and expenses from local storage
+balance = loadBalanceFromLocalStorage();
+expenses = loadExpensesFromLocalStorage();
+
+function setInitialEntry() {
+    const startingBalance = parseFloat(document.getElementById('balanceInput').value) || 0;
+    balance = startingBalance;
+    const initialEntry = {
+        description: 'Starting Balance',
+        date: new Date().toLocaleDateString(),
+        category: 'Initial Entry',
+        amount: 0,
+        balance: startingBalance,
+    };
+    expenses.push(initialEntry);
+    updateTable();
+    updateLocalStorage();
+}
+
+
+
 
                 function addExpense() {
                     const description = document.getElementById('descriptionInput').value;
