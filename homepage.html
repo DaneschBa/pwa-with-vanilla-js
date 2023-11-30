@@ -10,13 +10,48 @@
     <header>
         <h1>Willkommen auf meiner Webseite</h1>
     </header>
-    
+    <style>
+    body {
+        background-color: #f0f0f0; /* Set the outer background color to grey */
+        color: white; /* Set text color to white */
+        margin: 0; /* Remove default body margin */
+        padding: 0; /* Remove default body padding */
+    }
+
+    nav {
+        background-color: #808080; /* Set navbar background color to grey */
+        padding: 15px; /* Add padding to the navbar */
+    }
+
+    nav ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: flex;
+    }
+
+    nav li {
+        margin-right: 15px;
+    }
+
+    nav a {
+        text-decoration: none;
+        color: black; /* Set link text color to white */
+        transition: color 0.3s ease; /* Smooth transition for color change */
+    }
+
+    nav a:hover {
+        color: #FFFFFF; /* Change link color on hover to match the navbar color */
+    }
+</style>
+
     <nav>
         <ul>
             <li><a href="homepage.html">Homepage</a></li>
             <li><a href="index.html">Main</a></li>
             <li><a href="batterie.html">Batterie Status</a></li>
-            
+        </ul>
+    </nav>
 
     <script src="js/app.js"></script>
 </body>
