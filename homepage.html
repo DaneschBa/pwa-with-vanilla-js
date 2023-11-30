@@ -11,41 +11,40 @@
 <header>
     <h1>Willkommen auf meiner Webseite</h1>
 </header>
+<style>
+    body {
+        background-color: #f0f0f0;
+        color: black;
+        margin: 0;
+        padding: 0;
+    }
 
-body {
-background-color: #f0f0f0;
-color: black;
-margin: 0;
-padding: 0;
-}
+    nav {
+        background-color: #808080;
+        padding: 15px;
+    }
 
-nav {
-background-color: #808080;
-padding: 15px;
-}
+    nav ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: flex;
+    }
 
-nav ul {
-list-style: none;
-padding: 0;
-margin: 0;
-display: flex;
-}
+    nav li {
+        margin-right: 15px;
+    }
 
-nav li {
-margin-right: 15px;
-}
+    nav a {
+        text-decoration: none;
+        color: black;
+        transition: color 0.3s ease;
+    }
 
-nav a {
-text-decoration: none;
-color: black;
-transition: color 0.3s ease;
-}
-
-nav a:hover {
-color: #FFFFFF;
-}
+    nav a:hover {
+        color: #FFFFFF;
+    }
 </style>
-
 <nav>
     <ul>
         <li><a href="homepage.html">Homepage</a></li>
@@ -54,12 +53,178 @@ color: #FFFFFF;
     </ul>
 </nav>
 
+<style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        table, th, td {
+            border: 1px solid black;
+        }
+
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+
+        #balanceInput, #amountInput {
+            width: 100px;
+        }
+        .demo-layout-transparent {
+          background: url('../assets/demos/transparent.jpg') center / cover;
+        }
+        .demo-layout-transparent .mdl-layout__header,
+        .demo-layout-transparent .mdl-layout__drawer-button {
+          /* This background is dark, so we set text to white. Use 87% black instead if
+             your background is light. */
+             background-color: silver;
+          color: white;
+        }
+        </style>
+
+<div class="demo-layout-transparent mdl-layout mdl-js-layout">
+    <header class="mdl-layout__header mdl-layout__header--transparent">
+        <div class="mdl-layout__header-row">
+            <!-- Title -->
+            <span class="mdl-layout-title">Title</span>
+            <!-- Add spacer, to align navigation to the right -->
+            <div class="mdl-layout-spacer"></div>
+            <!-- Navigation -->
+            <nav class="mdl-navigation">
+                <a class="mdl-navigation__link" href="homepage.html">Homepage</a>
+                <a class="mdl-navigation__link" href="index.html">Index</a>
+                <a class="mdl-navigation__link" href="baterie.html">Batterie</a>
+                <a class="mdl-navigation__link" href="">Link</a>
+            </nav>
+        </div>
+    </header>
+    <div class="mdl-layout__drawer">
+        <span class="mdl-layout-title">Title</span>
+        <nav class="mdl-navigation">
+            <a class="mdl-navigation__link" href="homepage.html">homepage</a>
+            <a class="mdl-navigation__link" href="index.html">index</a>
+            <a class="mdl-navigation__link" href="baterie.html">Batterie</a>
+            <a class="mdl-navigation__link" href="">Link</a>
+        </nav>
+    </div>
+    <main class="mdl-layout__content">
+        <<h1>Expense Tracker</h1>
+
+        <label for="balanceInput">Starting Balance:</label>
+        <input type="number" id="balanceInput" placeholder="Enter starting balance">
+        <button onclick="setInitialEntry()">Initial Entry</button>
+
+        <table id="expenseTable">
+            <thead>
+            <tr>
+                <th>Beschreibung</th>
+                <th>Datum</th>
+                <th>Kategorie</th>
+                <th>Amount</th>
+                <th>Balance</th>
+            </tr>
+            </thead>
+            <tbody>
+            <!-- Table rows will be added dynamically -->
+            </tbody>
+        </table>
+
+        <label for="descriptionInput">Beschreibung:</label>
+        <input type="text" id="descriptionInput" placeholder="Enter description">
+
+        <label for="categoryInput">Kategorie:</label>
+        <input type="text" id="categoryInput" placeholder="Enter category">
+
+        <label for="amountInput">Amount:</label>
+        <input type="number" id="amountInput" placeholder="Enter amount">
+
+        <button onclick="addExpense()">Add Expense</button>
+        <button onclick="clearCache()">Clear Cache</button>
+
+        <script>
+                let balance = 0;
+                let expenses = [];
+
+                // Load expenses from local storage
+                if (localStorage.getItem('expenses')) {
+                    expenses = JSON.parse(localStorage.getItem('expenses'));
+                    updateTable();
+                }
+
+                function setInitialEntry() {
+                    const startingBalance = parseFloat(document.getElementById('balanceInput').value) || 0;
+                    balance = startingBalance;
+                    const initialEntry = {
+                        description: 'Starting Balance',
+                        date: new Date().toLocaleDateString(),
+                        category: 'Initial Entry',
+                        amount: 0,
+                        balance: startingBalance,
+                    };
+                    expenses.push(initialEntry);
+                    updateTable();
+                    updateLocalStorage();
+                }
+
+                function addExpense() {
+                    const description = document.getElementById('descriptionInput').value;
+                    const category = document.getElementById('categoryInput').value;
+                    const amount = parseFloat(document.getElementById('amountInput').value);
+
+                    if (!description || !category || isNaN(amount)) {
+                        alert('Please fill in all fields with valid values.');
+                        return;
+                    }
+
+                    const date = new Date().toLocaleDateString();
+                    const newBalance = balance - amount;
+
+                    expenses.push({ description, date, category, amount, balance: newBalance });
+                    updateTable();
+                    updateBalance(newBalance);
+                    updateLocalStorage();
+
+                    // Clear input fields
+                    document.getElementById('descriptionInput').value = '';
+                    document.getElementById('categoryInput').value = '';
+                    document.getElementById('amountInput').value = '';
+                }
+
+                function updateTable() {
+                    const tableBody = document.querySelector('#expenseTable tbody');
+                    tableBody.innerHTML = '';
+
+                    expenses.forEach(expense => {
+                        const row = tableBody.insertRow();
+                        Object.values(expense).forEach(value => {
+                            const cell = row.insertCell();
+                            cell.textContent = value;
+                        });
+                    });
+                }
+
+                function updateBalance(newBalance) {
+                    balance = newBalance;
+                }
+
+                function updateLocalStorage() {
+                    localStorage.setItem('expenses', JSON.stringify(expenses));
+                }
+
+                function clearCache() {
+                    localStorage.removeItem('expenses');
+                    expenses = [];
+                    balance = 0;
+                    updateTable();
+                    updateBalance(0);
+                }
+            </script>
+    </main>
+</div>
+
 <script src="js/app.js"></script>
-
-
-
-
-
 
 </body>
 </html>
