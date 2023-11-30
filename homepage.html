@@ -84,133 +84,128 @@
         }
         </style>
 
-    <main class="mdl-layout__content">
-        <h1>Expense Tracker</h1>
+<main class="mdl-layout__content">
+    <h1>Expense Tracker</h1>
 
-        <label for="balanceInput">Starting Balance:</label>
-        <input type="number" id="balanceInput" placeholder="...">
-        <button onclick="setInitialEntry()">Initial Entry</button>
+    <label for="balanceInput">Starting Balance:</label>
+    <input type="number" id="balanceInput" placeholder="Enter starting balance">
+    <button onclick="setInitialEntry()">Initial Entry</button>
 
-        <label for="descriptionInput">Beschreibung:</label>
-        <input type="text" id="descriptionInput" placeholder="...">
+    <table id="expenseTable">
+        <thead>
+        <tr>
+            <th>Beschreibung</th>
+            <th>Datum</th>
+            <th>Kategorie</th>
+            <th>Amount</th>
+            <th>Balance</th>
+        </tr>
+        </thead>
+        <tbody>
+        <!-- Table rows will be added dynamically -->
+        </tbody>
+    </table>
 
-        <label for="categoryInput">Kategorie:</label>
-        <input type="text" id="categoryInput" placeholder="...">
+    <label for="descriptionInput">Beschreibung:</label>
+    <input type="text" id="descriptionInput" placeholder="Enter description">
 
-        <label for="amountInput">Amount:</label>
-        <input type="number" id="amountInput" placeholder="...">
+    <label for="categoryInput">Kategorie:</label>
+    <input type="text" id="categoryInput" placeholder="Enter category">
 
-        <button onclick="addExpense()">Add Expense</button>
+    <label for="amountInput">Amount:</label>
+    <input type="number" id="amountInput" placeholder="Enter amount">
 
+    <button onclick="addExpense()">Add Expense</button>
+    <button onclick="clearCache()">Clear Cache</button>
 
-        <table id="expenseTable">
-            <thead>
-            <tr>
-                <th>Beschreibung</th>
-                <th>Datum</th>
-                <th>Kategorie</th>
-                <th>Amount</th>
-                <th>Balance</th>
-            </tr>
-            </thead>
-            <tbody>
-            <!-- Table rows will be added dynamically -->
-            </tbody>
-        </table>
+    <script>
+              let balance = 0;
+              let expenses = [];
 
-        <script>
+              // Load balance from local storage
+              if (localStorage.getItem('balance')) {
+                  balance = parseFloat(localStorage.getItem('balance')) || 0;
+              }
 
-let balance = 0;
-let expenses = [];
+              // Load expenses from local storage
+              if (localStorage.getItem('expenses')) {
+                  expenses = JSON.parse(localStorage.getItem('expenses'));
+                  updateTable();
+              }
 
-// Funktion, um den Balance-Wert vom lokalen Speicher abzurufen
-function loadBalanceFromLocalStorage() {
-    const savedBalance = localStorage.getItem('balance');
-    return savedBalance ? parseFloat(savedBalance) : 0;
-}
+              function setInitialEntry() {
+                  const startingBalance = parseFloat(document.getElementById('balanceInput').value) || 0;
+                  balance = startingBalance;
+                  localStorage.setItem('balance', balance);
 
-// Funktion, um die Ausgaben vom lokalen Speicher abzurufen
-function loadExpensesFromLocalStorage() {
-    const savedExpenses = localStorage.getItem('expenses');
-    return savedExpenses ? JSON.parse(savedExpenses) : [];
-}
+                  const initialEntry = {
+                      description: 'Starting Balance',
+                      date: new Date().toLocaleDateString(),
+                      category: 'Initial Entry',
+                      amount: 0,
+                      balance: startingBalance,
+                  };
+                  expenses.push(initialEntry);
+                  updateTable();
+                  updateLocalStorage();
+              }
 
-// Load balance and expenses from local storage
-balance = loadBalanceFromLocalStorage();
-expenses = loadExpensesFromLocalStorage();
+              function addExpense() {
+                  const description = document.getElementById('descriptionInput').value;
+                  const category = document.getElementById('categoryInput').value;
+                  const amount = parseFloat(document.getElementById('amountInput').value);
 
-function setInitialEntry() {
-    const startingBalance = parseFloat(document.getElementById('balanceInput').value) || 0;
-    balance = startingBalance;
-    const initialEntry = {
-        description: 'Starting Balance',
-        date: new Date().toLocaleDateString(),
-        category: 'Initial Entry',
-        amount: 0,
-        balance: startingBalance,
-    };
-    expenses.push(initialEntry);
-    updateTable();
-    updateLocalStorage();
-}
+                  if (!description || !category || isNaN(amount)) {
+                      alert('Please fill in all fields with valid values.');
+                      return;
+                  }
 
+                  const date = new Date().toLocaleDateString();
+                  const newBalance = balance - amount;
 
+                  expenses.push({ description, date, category, amount, balance: newBalance });
+                  updateTable();
+                  updateBalance(newBalance);
+                  updateLocalStorage();
 
+                  // Clear input fields
+                  document.getElementById('descriptionInput').value = '';
+                  document.getElementById('categoryInput').value = '';
+                  document.getElementById('amountInput').value = '';
+              }
 
-                function addExpense() {
-                    const description = document.getElementById('descriptionInput').value;
-                    const category = document.getElementById('categoryInput').value;
-                    const amount = parseFloat(document.getElementById('amountInput').value);
+              function updateTable() {
+                  const tableBody = document.querySelector('#expenseTable tbody');
+                  tableBody.innerHTML = '';
 
-                    if (!description || !category || isNaN(amount)) {
-                        alert('Please fill in all fields with valid values.');
-                        return;
-                    }
+                  expenses.forEach(expense => {
+                      const row = tableBody.insertRow();
+                      Object.values(expense).forEach(value => {
+                          const cell = row.insertCell();
+                          cell.textContent = value;
+                      });
+                  });
+              }
 
-                    const date = new Date().toLocaleDateString();
-                    const newBalance = balance - amount;
+              function updateBalance(newBalance) {
+                  balance = newBalance;
+                  localStorage.setItem('balance', balance);
+              }
 
-                    expenses.push({ description, date, category, amount, balance: newBalance });
-                    updateTable();
-                    updateBalance(newBalance);
-                    updateLocalStorage();
+              function updateLocalStorage() {
+                  localStorage.setItem('expenses', JSON.stringify(expenses));
+              }
 
-                    // Clear input fields
-                    document.getElementById('descriptionInput').value = '';
-                    document.getElementById('categoryInput').value = '';
-                    document.getElementById('amountInput').value = '';
-                }
-
-                function updateTable() {
-                    const tableBody = document.querySelector('#expenseTable tbody');
-                    tableBody.innerHTML = '';
-
-                    expenses.forEach(expense => {
-                        const row = tableBody.insertRow();
-                        Object.values(expense).forEach(value => {
-                            const cell = row.insertCell();
-                            cell.textContent = value;
-                        });
-                    });
-                }
-
-                function updateBalance(newBalance) {
-                    balance = newBalance;
-                }
-
-                function updateLocalStorage() {
-                    localStorage.setItem('expenses', JSON.stringify(expenses));
-                }
-
-                function clearCache() {
-                    localStorage.removeItem('expenses');
-                    expenses = [];
-                    balance = 0;
-                    updateTable();
-                    updateBalance(0);
-                }
-            </script>
-    </main>
+              function clearCache() {
+                  localStorage.removeItem('expenses');
+                  localStorage.removeItem('balance');
+                  expenses = [];
+                  balance = 0;
+                  updateTable();
+                  updateBalance(0);
+              }
+          </script>
+</main>
 </div>
 
 <script src="js/app.js"></script>
