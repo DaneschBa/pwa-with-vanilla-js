@@ -34,6 +34,21 @@
     nav a:hover {
         color: #FFFFFF;
     }
+
+    table {
+      border-collapse: collapse;
+      width: 100%;
+    }
+    th, td {
+      text-align: left;
+      padding: 8px;
+      border: 1px solid black;
+    }
+    th {
+      background-color: gray;
+      color: white;
+    }
+
 </style>
 
 <nav>
@@ -57,10 +72,6 @@
   color: white;
   text-align: center;
   -ms-touch-action: none;
-}
-
-thead {
-  background-color: gray;
 }
 
 </style>
@@ -117,14 +128,11 @@ thead {
 </script>
 
 <table>
-    <thead>
     <tr>
         <th>Aufgaben</th>
         <th>In Bearbeitung</th>
         <th>Erledigt</th>
     </tr>
-    </thead>
-    <tbody>
     <tr>
         <td>Task 1</td>
         <td></td>
@@ -140,7 +148,6 @@ thead {
         <td></td>
         <td></td>
     </tr>
-    </tbody>
 </table>
 
 
