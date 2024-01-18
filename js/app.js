@@ -1,35 +1,27 @@
 const container = document.querySelector(".container");
 
 
-//Save "Notes" object e.g. boxes objects inside elements
 var elements = document.querySelectorAll('.test-element');
 
-
-//Add new notes ba appending new box object into boxContainer where all created notes land intially
   function addBox() {
     var boxContainer = document.getElementById("boxContainer");
     var newBox = document.createElement("div");
     newBox.className = "test-element";
-    newBox.textContent = "newTask"; // Add text or other content as needed
+    newBox.textContent = "newTask"; 
     boxContainer.appendChild(newBox);
-    makeDraggable(newBox); // Make the new box draggable
+    makeDraggable(newBox);
   }
 
-
-//Allows for moving notes
   function makeDraggable(element) {
     element.ontouchstart = element.onmspointerdown = startDrag;
   }
 
-
  var elements = document.querySelectorAll('.test-element');
  elements.forEach(makeDraggable);
 
- // Add new box on button click event. Is being called on pressing the add box button. (Box = Note)
  document.getElementById("addBoxBtn").addEventListener("click", addBox);
 
 
-// All the code below is being provided by WhatWebCanDo
 function startDrag(e) {
   this.ontouchmove = this.onmspointermove = moveDrag;
 
@@ -50,11 +42,6 @@ function startDrag(e) {
     this.style.top = (pos[1] + deltaY) + 'px';
     return false; // cancels scrolling
   }
-
-
-  // Return coordinate values for maintaining pos inside document. However breaks when adding more then 3 lanes because horizontal scrolling comes into play.
-  // Solution: disable scrolling or create fixed sized document site.
-  // Problem: Not enough time for the exercise ...
 
   function getCoors(e) {
     var coors = [];
@@ -79,8 +66,6 @@ function startDrag(e) {
   document.ongesturechange = function () {
     return false;
   }
-//______________________________________________________________
-
 
 document.getElementById("addLaneBtn").addEventListener("click", addLane);
 
