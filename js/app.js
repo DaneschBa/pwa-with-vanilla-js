@@ -169,7 +169,7 @@ async function playbackFromCache() {
   }
 }
 
-document.getElementById('playButton').addEventListener('click', playbackFromCache);
+//document.getElementById('playButton').addEventListener('click', playbackFromCache);
 
 // Funktion, um den Cache zu leeren
 function clearCache() {
