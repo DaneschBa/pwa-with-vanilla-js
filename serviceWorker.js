@@ -12,12 +12,6 @@ self.addEventListener("install", installEvent => {
 
 self.addEventListener("activate", activateEvent => {
   console.log('Service Worker: Activate Event');
-  activateEvent.waitUntil(
-    caches.keys().then(keys => {
-      return Promise.all(
-        keys
-          .filter(key => key !== staticDevCoffee)
-          .map(key => caches.delete(key)) // Löscht alte Caches
       );
     })
   );
